@@ -5,19 +5,38 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float speed = 20f;
     [SerializeField] private float lifetime = 3f;
 
-    void Start()
+    private float _lifeLeft;
+    private PooledObject _pooled;
+
+    private void Awake()
     {
-        Destroy(gameObject, lifetime);
+        _pooled = GetComponent<PooledObject>();
+    }
+
+    private void OnEnable()
+    {
+        _lifeLeft = lifetime;
     }
 
     void Update()
     {
         transform.position += Vector3.forward * speed * Time.deltaTime;
+
+        _lifeLeft -= Time.deltaTime;
+        if (_lifeLeft <= 0f)
+        {
+            ReturnToPool();
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void ReturnToPool()
     {
-        // We'll handle actual hit logic on the Zombie for simplicity,
-        // but you can destroy bullet here if you want.
+    if (_pooled == null || _pooled.Pool == null)
+        {
+            Debug.LogError($"{name} has no pool reference. Did you forget PooledObject on the prefab?");
+            gameObject.SetActive(false);
+            return;
+        }
+        _pooled.Pool.Release(gameObject);
     }
 }

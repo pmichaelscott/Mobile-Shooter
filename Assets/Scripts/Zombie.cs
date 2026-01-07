@@ -4,24 +4,59 @@ public class Zombie : MonoBehaviour
 {
     [SerializeField] private float speed = 3.5f;
 
+    private PooledObject _pooled;
+    private bool _hitSomething;
+
+    private void Awake()
+    {
+        _pooled = GetComponent<PooledObject>();
+    }
+
     void Update()
     {
         transform.position += Vector3.back * speed * Time.deltaTime;
     }
 
-    private void OnTriggerEnter(Collider other)
+   private void OnTriggerEnter(Collider other)
+{
+    if (_hitSomething) return;
+
+    // Bullet hit: both go back to pools
+    var bullet = other.GetComponent<Bullet>();
+    if (bullet != null)
     {
-        if (other.GetComponent<Bullet>() != null)
+        _hitSomething = true;
+        bullet.ReturnToPool();
+        ReturnToPool();
+        return;
+    }
+
+    // Soldier hit: remove ONLY that soldier
+    var soldier = other.GetComponentInParent<SoldierMarker>();
+    if (soldier != null)
+    {
+        _hitSomething = true;
+
+        var squad = soldier.GetComponentInParent<SquadSoldierAdder>();
+        if (squad != null)
+            squad.RemoveSoldier(soldier);
+
+        ReturnToPool();
+        return;
+    }
+}
+private void OnEnable()
+{
+    _hitSomething = false;
+}
+    private void ReturnToPool()
+    {
+    if (_pooled == null || _pooled.Pool == null)
         {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            Debug.LogError($"{name} has no pool reference. Did you forget PooledObject on the prefab?");
+            gameObject.SetActive(false);
             return;
         }
-
-        // If zombie touches a soldier, player loses immediately
-        if (other.GetComponentInParent<SoldierMarker>() != null)
-        {
-            GameManager.Instance.Lose();
-        }
+        _pooled.Pool.Release(gameObject);
     }
 }

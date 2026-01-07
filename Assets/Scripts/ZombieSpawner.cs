@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ZombieSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject zombiePrefab;
+    [SerializeField] private ObjectPool zombiePool;
     [SerializeField] private float zombiesPerSecond = 20f;
     [SerializeField] private float minX = -8f;
     [SerializeField] private float maxX =  8f;
@@ -24,7 +24,7 @@ public class ZombieSpawner : MonoBehaviour
     void Spawn()
     {
         float x = Random.Range(minX, maxX);
-        Vector3 pos = new Vector3(x, 1f, transform.position.z);
-        Instantiate(zombiePrefab, pos, Quaternion.identity);
+        Vector3 pos = new Vector3(x, 0.5f, transform.position.z);
+        zombiePool.Get(pos, Quaternion.identity);
     }
 }
