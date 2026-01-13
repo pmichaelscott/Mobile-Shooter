@@ -1,57 +1,199 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SquadSoldierAdder : MonoBehaviour
 {
     [SerializeField] private GameObject soldierPrefab;
-    [SerializeField] private ObjectPool bulletPool;   // assign in inspector
-    [SerializeField] private float spacing = 1.0f;
+    [SerializeField] private ObjectPool bulletPool;
+
+    [Header("Cluster Placement")]
+    [SerializeField] private float clusterRadius = 1.2f;
+    [SerializeField] private float minSeparation = 0.7f;
+    [SerializeField] private int maxAttemptsPerSoldier = 40;
+
+    [SerializeField] private float soldierHeight = 0f;
+
+    private int _nextId = 1;
+
+    // Stable positions per soldier instance
+    private readonly Dictionary<int, Vector3> _positions = new();
+    private readonly HashSet<int> _alive = new();
+
+    private SoldierInstance _anchor; // the centered soldier
 
     private void Awake()
     {
-        // Wire up any starting soldiers already in the hierarchy
-        foreach (var shooter in GetComponentsInChildren<Shooter>(includeInactive: true))
-            shooter.SetBulletPool(bulletPool);
+        // If you start with a soldier already placed under SquadRoot, make it the anchor.
+        _anchor = GetComponentInChildren<SoldierInstance>(includeInactive: true);
 
-        LayoutAll();
+        if (_anchor != null)
+        {
+            EnsureWired(_anchor.gameObject);
+
+            _anchor.Id = 0;                    // anchor always id 0
+            _positions[_anchor.Id] = Vector3.zero;
+            _alive.Add(_anchor.Id);
+            _anchor.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            // If no starting soldier, create one as the anchor
+            SpawnAnchor();
+        }
+
+        // Wire up any other pre-placed soldiers. I haven't yet seen a case for this, but leaving it here
+        foreach (var s in GetComponentsInChildren<SoldierInstance>(includeInactive: true))
+        {
+            if (s == _anchor) continue;
+            EnsureWired(s.gameObject);
+
+            if (s.Id == 0 && s != _anchor) s.Id = _nextId++;
+            if (!_positions.ContainsKey(s.Id))
+            {
+                _positions[s.Id] = FindNonOverlappingPoint();
+            }
+            _alive.Add(s.Id);
+            s.transform.localPosition = _positions[s.Id];
+        }
+    }
+
+    private void SpawnAnchor()
+    {
+        var go = Instantiate(soldierPrefab, transform);
+        EnsureWired(go);
+
+        _anchor = go.GetComponent<SoldierInstance>();
+        if (_anchor == null) _anchor = go.AddComponent<SoldierInstance>();
+
+        _anchor.Id = 0;
+        _positions[0] = Vector3.zero;
+        _alive.Add(0);
+        _anchor.transform.localPosition = Vector3.zero;
     }
 
     public int SoldierCount => GetComponentsInChildren<SoldierMarker>().Length;
 
     public void AddSoldier()
     {
-        var soldierGO = Instantiate(soldierPrefab, transform);
+        // Ensure anchor exists
+        if (_anchor == null) SpawnAnchor();
 
-        var shooter = soldierGO.GetComponentInChildren<Shooter>();
-        if (shooter != null)
-            shooter.SetBulletPool(bulletPool);
+        var go = Instantiate(soldierPrefab, transform);
+        EnsureWired(go);
 
-        LayoutAll();
+        var inst = go.GetComponent<SoldierInstance>();
+        if (inst == null) inst = go.AddComponent<SoldierInstance>();
+
+        inst.Id = _nextId++;
+        _alive.Add(inst.Id);
+
+        Vector3 pos = FindNonOverlappingPoint();
+        _positions[inst.Id] = pos;
+        inst.transform.localPosition = pos;
     }
 
-    public void RemoveSoldier(SoldierMarker soldier)
+    public void RemoveSoldier(SoldierMarker soldierMarker)
     {
-        if (soldier == null) return;
+        if (soldierMarker == null) return;
 
-        Destroy(soldier.gameObject); // removes only that soldier
-        // Re-layout after the object is actually removed
-        Invoke(nameof(LayoutAllAndCheckGameOver), 0f);
+        var inst = soldierMarker.GetComponent<SoldierInstance>();
+        if (inst == null)
+        {
+            Destroy(soldierMarker.gameObject);
+            Invoke(nameof(CheckGameOver), 0f);
+            return;
+        }
+
+
+        // If anchor dies, promote another soldier to center WITHOUT moving everyone else.
+        if (inst.Id == 0)
+        {
+            Destroy(inst.gameObject);
+            _alive.Remove(0);
+            _positions.Remove(0);
+
+            PromoteNewAnchor();
+            Invoke(nameof(CheckGameOver), 0f);
+            return;
+        }
+
+        Destroy(inst.gameObject);
+        _alive.Remove(inst.Id);
+        _positions.Remove(inst.Id);
+
+        Invoke(nameof(CheckGameOver), 0f);
     }
 
-    private void LayoutAllAndCheckGameOver()
+    private void PromoteNewAnchor()
     {
-        LayoutAll();
+        // If anyone left, pick one and snap it to center (this moves only the promoted one)
+        var remaining = GetComponentsInChildren<SoldierInstance>();
+        if (remaining.Length == 0)
+        {
+            _anchor = null;
+            return;
+        }
 
+        // Choose first remaining
+        var newAnchor = remaining[0];
+
+        // Remove its old position record
+        _positions.Remove(newAnchor.Id);
+        _alive.Remove(newAnchor.Id);
+
+        // Make it anchor id 0 at center
+        newAnchor.Id = 0;
+        _anchor = newAnchor;
+
+        _positions[0] = Vector3.zero;
+        _alive.Add(0);
+        _anchor.transform.localPosition = Vector3.zero;
+    }
+
+    private void CheckGameOver()
+    {
         if (SoldierCount <= 0)
             GameManager.Instance.Lose();
     }
 
-    private void LayoutAll()
+    private void EnsureWired(GameObject soldierGO)
     {
-        var soldiers = GetComponentsInChildren<SoldierMarker>();
-        int count = soldiers.Length;
-        float offset = (count - 1) * spacing * 0.5f;
+        // Ensure bullet pool assigned to shooter
+        var shooter = soldierGO.GetComponentInChildren<Shooter>();
+        if (shooter != null)
+            shooter.SetBulletPool(bulletPool);
+    }
 
-        for (int i = 0; i < count; i++)
-            soldiers[i].transform.localPosition = new Vector3(i * spacing - offset, 0f, 0f);
+    private Vector3 FindNonOverlappingPoint()
+    {
+        // Build a list of currently used positions
+        var used = new List<Vector3>(_positions.Values);
+
+        for (int attempt = 0; attempt < maxAttemptsPerSoldier; attempt++)
+        {
+            Vector2 p2 = Random.insideUnitCircle * clusterRadius;
+
+            // Cluster around anchor at local (0,0,0)
+            Vector3 candidate = new Vector3(p2.x, soldierHeight, p2.y);
+
+            // Don't place on the exact center (reserve for anchor)
+            if (candidate.sqrMagnitude < 0.0001f) continue;
+
+            bool ok = true;
+            for (int i = 0; i < used.Count; i++)
+            {
+                if (Vector3.Distance(candidate, used[i]) < minSeparation)
+                {
+                    ok = false;
+                    break;
+                }
+            }
+
+            if (ok) return candidate;
+        }
+
+        // Fallback if packed too tight
+        Vector2 fallback = Random.insideUnitCircle * clusterRadius;
+        return new Vector3(fallback.x, soldierHeight, fallback.y);
     }
 }
