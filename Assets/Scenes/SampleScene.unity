@@ -651,7 +651,7 @@ Transform:
   m_GameObject: {fileID: 933963717}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.10501, y: 2.74, z: 37.23}
+  m_LocalPosition: {x: 1.10501, y: 2.08, z: 37.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -670,10 +670,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BigZombieSpawner
   bigZombiePrefab: {fileID: 5446814598812274797, guid: f4bc691f13e0bbb4baa95b247bd47534, type: 3}
+  maxAlive: 2
   spawnEverySeconds: 10
   minX: -8
   maxX: 8
-  maxAlive: 2
+  minHits: 40
+  maxHits: 140
+  hitIncrement: 10
 --- !u!1 &999908844
 GameObject:
   m_ObjectHideFlags: 0

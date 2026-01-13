@@ -3,40 +3,27 @@ using UnityEngine;
 
 public class BigZombie : MonoBehaviour
 {
-    [Header("Stats")]
-    [SerializeField] private int maxHits = 50;
-    [SerializeField] private float speed = 2.5f;
+    [SerializeField] private float speed = 2.0f;
 
     [Header("UI")]
-    [SerializeField] private TextMeshPro counterText; // TextMeshPro (3D), not TMPUGUI
-    [SerializeField] private Vector3 textOffset = new Vector3(0f, 1.5f, 0f);
+    [SerializeField] private TextMeshPro hitsText;
 
     private int _hitsLeft;
-    private bool _dead;
-
-    private void Start()
-    {
-        _hitsLeft = maxHits;
-        UpdateCounter();
-    }
 
     private void Update()
     {
-        if (_dead) return;
-
-        // Same movement as regular zombie (down screen)
         transform.position += Vector3.back * speed * Time.deltaTime;
+    }
 
-        // Keep the counter floating above the zombie
-        if (counterText != null)
-            counterText.transform.position = transform.position + textOffset;
+    // Called by spawner right after Instantiate
+    public void InitializeHits(int hits)
+    {
+        _hitsLeft = Mathf.Max(1, hits);
+        UpdateText();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (_dead) return;
-
-        // Bullet hit
         var bullet = other.GetComponent<Bullet>();
         if (bullet != null)
         {
@@ -45,19 +32,12 @@ public class BigZombie : MonoBehaviour
             return;
         }
 
-        // Soldier hit (same rule as your normal zombies)
         var soldier = other.GetComponentInParent<SoldierMarker>();
         if (soldier != null)
         {
             var squad = soldier.GetComponentInParent<SquadSoldierAdder>();
             if (squad != null)
                 squad.RemoveSoldier(soldier);
-
-            // Optional design choice:
-            // If big zombie collides with a soldier, should it die or keep going?
-            // If you want it to keep going, do nothing here.
-            // If you want it removed on contact, call Die().
-            return;
         }
     }
 
@@ -66,23 +46,17 @@ public class BigZombie : MonoBehaviour
         _hitsLeft -= amount;
         if (_hitsLeft <= 0)
         {
-            Die();
+            Destroy(gameObject);
         }
         else
         {
-            UpdateCounter();
+            UpdateText();
         }
     }
 
-    private void UpdateCounter()
+    private void UpdateText()
     {
-        if (counterText != null)
-            counterText.text = _hitsLeft.ToString();
-    }
-
-    private void Die()
-    {
-        _dead = true;
-        Destroy(gameObject);
+        if (hitsText != null)
+            hitsText.text = _hitsLeft.ToString();
     }
 }
