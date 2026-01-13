@@ -625,6 +625,55 @@ MonoBehaviour:
   prefab: {fileID: 3201245408981343604, guid: 9a946d091f8107447a9220ff7b36fbe7, type: 3}
   prewarmCount: 100
   canGrow: 1
+--- !u!1 &933963717
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 933963718}
+  - component: {fileID: 933963719}
+  m_Layer: 0
+  m_Name: BigZombieSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &933963718
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933963717}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.10501, y: 2.74, z: 37.23}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &933963719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933963717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a6368644bae0e7478fd78d2100d2a32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BigZombieSpawner
+  bigZombiePrefab: {fileID: 5446814598812274797, guid: f4bc691f13e0bbb4baa95b247bd47534, type: 3}
+  spawnEverySeconds: 10
+  minX: -8
+  maxX: 8
+  maxAlive: 2
 --- !u!1 &999908844
 GameObject:
   m_ObjectHideFlags: 0
@@ -656,6 +705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83d964ed02e4efe4d9016f080c5724b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DespawnZone
+  loseIfZombieEnters: 1
 --- !u!65 &999908846
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -686,7 +736,7 @@ Transform:
   m_GameObject: {fileID: 999908844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -18.63}
+  m_LocalPosition: {x: 0, y: 0.68, z: -11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -845,6 +895,32 @@ MonoBehaviour:
   prefab: {fileID: 3547470911998853741, guid: ee928db731fdd1d4097baf1cb4df9dfa, type: 3}
   prewarmCount: 10
   canGrow: 1
+--- !u!1 &1284631754 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7055385412725877068, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
+  m_PrefabInstance: {fileID: 117826694202070069}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1284631758
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284631754}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2039029761
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,10 +1020,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1460655408649873944, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
-      propertyPath: bulletPool
-      value: 
-      objectReference: {fileID: 1192133487}
     - target: {fileID: 4343685604311356080, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
       propertyPath: bulletPool
       value: 
@@ -958,7 +1030,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5412856988164077866, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: 1.16
       objectReference: {fileID: 0}
     - target: {fileID: 5412856988164077866, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
       propertyPath: m_LocalPosition.z
@@ -999,7 +1071,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7055385412725877068, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1284631758}
   m_SourcePrefab: {fileID: 100100000, guid: f2bef524739d5f8448dd4998604e6f31, type: 3}
 --- !u!1001 &7578999258657355045
 PrefabInstance:
@@ -1146,3 +1221,4 @@ SceneRoots:
   - {fileID: 7977099145913734345}
   - {fileID: 7578999258657355045}
   - {fileID: 999908847}
+  - {fileID: 933963718}

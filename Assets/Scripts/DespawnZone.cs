@@ -7,7 +7,8 @@ public class DespawnZone : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // End game if a zombie crosses this line
-        if (loseIfZombieEnters && other.GetComponentInParent<Zombie>() != null)
+        if (loseIfZombieEnters && (other.GetComponentInParent<Zombie>() != null ||
+            other.GetComponentInParent<BigZombie>() != null))
         {
             GameManager.Instance.Lose();
             return;
