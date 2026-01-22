@@ -46,6 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickupSpawner
   pickupPrefab: {fileID: 3201245408981343604, guid: 9a946d091f8107447a9220ff7b36fbe7, type: 3}
   pickupPool: {fileID: 0}
-  pickupsPerSecond: 25
+  pickupsPerSecond: 20
   minX: -8
   maxX: 8

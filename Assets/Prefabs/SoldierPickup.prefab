@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2197d6b3f7129fa439f4ed181b2f2e35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupMover
-  speed: 6
+  speed: 4
 --- !u!114 &1022799769636981377
 MonoBehaviour:
   m_ObjectHideFlags: 0

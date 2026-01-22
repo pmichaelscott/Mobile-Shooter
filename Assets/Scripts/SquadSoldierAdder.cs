@@ -152,7 +152,7 @@ public class SquadSoldierAdder : MonoBehaviour
 
     private void CheckGameOver()
     {
-        if (SoldierCount <= 0)
+        if (GetComponentsInChildren<SoldierMarker>().Length <= 0)
             GameManager.Instance.Lose();
     }
 
@@ -196,4 +196,38 @@ public class SquadSoldierAdder : MonoBehaviour
         Vector2 fallback = Random.insideUnitCircle * clusterRadius;
         return new Vector3(fallback.x, soldierHeight, fallback.y);
     }
+    public SoldierMarker GetNearestSoldier(Vector3 fromWorldPos)
+    {
+        var soldiers = GetComponentsInChildren<SoldierMarker>();
+        if (soldiers.Length == 0) return null;
+
+        SoldierMarker best = null;
+        float bestDistSq = float.PositiveInfinity;
+
+        for (int i = 0; i < soldiers.Length; i++)
+        {
+            float d = (soldiers[i].transform.position - fromWorldPos).sqrMagnitude;
+            if (d < bestDistSq)
+            {
+                bestDistSq = d;
+                best = soldiers[i];
+            }
+        }
+
+        return best;
+    }
+
+    // Used by the big zombie to remove all soldiers when it stomps
+    public void RemoveAllSoldiers()
+    {
+        var soldiers = GetComponentsInChildren<SoldierMarker>();
+        for (int i = 0; i < soldiers.Length; i++)
+        {
+            Destroy(soldiers[i].gameObject);
+        }
+
+        Invoke(nameof(CheckGameOver), 0f);
+    }
+
+
 }

@@ -45,7 +45,7 @@ public class BigZombieSpawner : MonoBehaviour
         _delayTimer = initialDelaySeconds;
         _spawnTimer = spawnEverySeconds;
         _rampTime = 0f;
-        _sizeModifier = 1f;
+        _sizeModifier = 3f;
     }
 
     private void OnValidate()

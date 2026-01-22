@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieSpawner
   zombiePool: {fileID: 0}
-  zombiesPerSecond: 10
+  zombiesPerSecond: 4
   minX: -8
   maxX: 8
