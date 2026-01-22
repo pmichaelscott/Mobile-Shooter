@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Shooter
   bulletPool: {fileID: 0}
-  shotsPerSecond: 6
+  shotsPerSecond: 3
   muzzle: {fileID: 8320924918615865856}
 --- !u!114 &654264898302936091
 MonoBehaviour:

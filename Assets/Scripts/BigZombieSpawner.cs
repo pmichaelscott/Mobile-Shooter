@@ -1,12 +1,17 @@
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class BigZombieSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject bigZombiePrefab;
+
     [Header("Spawn Timing")]
     [SerializeField] private int maxAlive = 2;
     [SerializeField] private float spawnEverySeconds = 10f;
     
+    [Header("Initial Delay")]
+    [SerializeField] private float initialDelaySeconds = 5f;
+
     [Header("Spawn Area")]
     [SerializeField] private float minX = -8f;
     [SerializeField] private float maxX =  8f;
@@ -16,8 +21,14 @@ public class BigZombieSpawner : MonoBehaviour
     [SerializeField] private int maxHits = 70;
     [SerializeField] private int hitIncrement = 15;
 
-    private float _t;
+    private float _spawnTimer;
+    private float _delayTimer;
 
+    private void Start()
+    {
+        _delayTimer = initialDelaySeconds;
+        _spawnTimer = spawnEverySeconds;
+    }
 
     private void OnValidate()
     {
@@ -28,11 +39,17 @@ public class BigZombieSpawner : MonoBehaviour
 
     void Update()
     {
-        _t -= Time.deltaTime;
-        if (_t <= 0f)
+        if (_delayTimer >0f)
+        {
+            _delayTimer -= Time.deltaTime;
+            return;
+        }
+
+        _spawnTimer -= Time.deltaTime;
+        if (_spawnTimer <= 0f)
         {
             TrySpawn();
-            _t = spawnEverySeconds;
+            _spawnTimer = spawnEverySeconds;
         }
     }
 
