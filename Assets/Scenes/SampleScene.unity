@@ -651,7 +651,7 @@ Transform:
   m_GameObject: {fileID: 933963717}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.10501, y: 2.08, z: 37.23}
+  m_LocalPosition: {x: 0, y: 0, z: 13.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -672,11 +672,97 @@ MonoBehaviour:
   bigZombiePrefab: {fileID: 5446814598812274797, guid: f4bc691f13e0bbb4baa95b247bd47534, type: 3}
   maxAlive: 2
   spawnEverySeconds: 10
+  initialDelaySeconds: 5
   minX: -8
   maxX: 8
-  minHits: 40
-  maxHits: 140
+  y: 0.5
+  rampDurationSeconds: 120
+  startMinHits: 30
+  startMaxHits: 40
+  endMinHits: 70
+  endMaxHits: 120
   hitIncrement: 10
+  rampCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0041656494
+      value: 0.1166687
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.09275538
+      value: 0.21358973
+      inSlope: 0.0052629276
+      outSlope: 0.0052629276
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.16816108
+    - serializedVersion: 3
+      time: 0.37831816
+      value: 0.2502675
+      inSlope: -0.08909305
+      outSlope: -0.08909305
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.26275262
+    - serializedVersion: 3
+      time: 0.47040483
+      value: 0.52296734
+      inSlope: 0.095369525
+      outSlope: 0.095369525
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.12469041
+    - serializedVersion: 3
+      time: 0.6929924
+      value: 0.5408887
+      inSlope: 0.025288027
+      outSlope: 0.025288027
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.27200535
+    - serializedVersion: 3
+      time: 0.81049544
+      value: 0.73365897
+      inSlope: -0.039350066
+      outSlope: -0.039350066
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.24421372
+    - serializedVersion: 3
+      time: 0.90122515
+      value: 0.8878833
+      inSlope: -0.09045906
+      outSlope: -0.09045906
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.77923
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  startSizeRange: {x: 3, y: 3, z: 0}
+  endSizeRange: {x: 3, y: 6, z: 0}
+  _sizeModifier: 0
 --- !u!1 &999908844
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,12 +1182,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2420976466567553434, guid: c32cf08685aa9f14794fb38232f3acc3, type: 3}
+      propertyPath: maxX
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2420976466567553434, guid: c32cf08685aa9f14794fb38232f3acc3, type: 3}
       propertyPath: zombiePool
       value: 
       objectReference: {fileID: 2132352509}
+    - target: {fileID: 2420976466567553434, guid: c32cf08685aa9f14794fb38232f3acc3, type: 3}
+      propertyPath: zombiesPerSecond
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 5873993535556395693, guid: c32cf08685aa9f14794fb38232f3acc3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5873993535556395693, guid: c32cf08685aa9f14794fb38232f3acc3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1158,7 +1252,7 @@ PrefabInstance:
       objectReference: {fileID: 847047369}
     - target: {fileID: 1998523047883344237, guid: f5794ac6ea94e0d45964f2e6fb9cd37e, type: 3}
       propertyPath: pickupsPerSecond
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5904424528622295288, guid: f5794ac6ea94e0d45964f2e6fb9cd37e, type: 3}
       propertyPath: m_LocalPosition.x
