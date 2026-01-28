@@ -21,18 +21,12 @@ public class ObjectPool : MonoBehaviour
 private GameObject CreateNew()
 {
     var obj = Instantiate(prefab, transform);
+    obj.SetActive(false);
 
     var po = obj.GetComponent<PooledObject>();
-    if (po == null)
-    {
-        Debug.LogError($"Prefab {prefab.name} is missing PooledObject. Add it to the prefab.", prefab);
-    }
-    else
-    {
-        po.Pool = this;
-    }
+    if (po == null) po = obj.AddComponent<PooledObject>();
+    po.Pool = this;
 
-    obj.SetActive(false);
     return obj;
 }
 

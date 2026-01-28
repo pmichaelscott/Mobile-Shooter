@@ -17,7 +17,7 @@ public class BigZombieSpawner : MonoBehaviour
     [Header("Spawn Area")]
     [SerializeField] private float minX = -8f;
     [SerializeField] private float maxX =  8f;
-    [SerializeField] private float y = 0.5f;
+    [SerializeField] private float y = 1.5f;
 
     [Header("Hit Range")]
     [Tooltip("Over how many seconds to ramp up from minHits to maxHits")]
@@ -81,7 +81,7 @@ public class BigZombieSpawner : MonoBehaviour
         Vector3 pos = new Vector3(x,y, transform.position.z);
 
         var go = Instantiate(bigZombiePrefab, pos, Quaternion.identity);
-        go.transform.localScale = Vector3.one * _sizeModifier;
+        go.GetComponent<Transform>().transform.localScale = Vector3.one * _sizeModifier;
 
         GetCurrentHitRange(out int minHitsNow, out int maxHitsNow);
         int hits = RollHits(minHitsNow, maxHitsNow, hitIncrement);

@@ -4,7 +4,8 @@ using System.Collections;
 
 public class BigZombie : MonoBehaviour
 {
-    [SerializeField] private float speed = 2.0f;
+    [SerializeField] private float baseSpeed = 2.0f;
+    [SerializeField] private float speedPerSoldier = 0.03f;
 
     [Header("UI")]
     [SerializeField] private TextMeshPro hitsText;
@@ -17,11 +18,13 @@ public class BigZombie : MonoBehaviour
     private int _hitsLeft;
     private bool _isStomping;
     private SquadSoldierAdder _squad;
+    private float _speedMultiplier = 1f;
+
 
     private void Update()
     {
         if (_isStomping) return;
-        transform.position += Vector3.back * speed * Time.deltaTime;
+        transform.position += Vector3.back * (baseSpeed * _speedMultiplier) * Time.deltaTime;
     }
 
     // Called by spawner right after Instantiate
@@ -125,6 +128,26 @@ public class BigZombie : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private void OnEnable()
+    {
+        _squad = GameManager.Instance.Squad;
+        if (_squad != null)
+        {
+            _squad.SoldierCountChanged += OnSoldierCountChanged;
+            OnSoldierCountChanged(_squad.CurrentSoldierCount);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_squad != null)
+            _squad.SoldierCountChanged -= OnSoldierCountChanged;
+    }
+
+    private void OnSoldierCountChanged(int count)
+    {
+        _speedMultiplier = 1f + count * speedPerSoldier;
+    }
 
 }
 

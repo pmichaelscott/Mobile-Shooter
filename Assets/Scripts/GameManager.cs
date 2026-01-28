@@ -4,12 +4,17 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public SquadSoldierAdder Squad { get; private set; }
+    
     private bool _gameOver;
 
     private void Awake()
     {
+        Debug.Log("GameManager Awake: " + gameObject.scene.name, this);
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+
+        
     }
 
     public void Lose()
@@ -24,5 +29,10 @@ public class GameManager : MonoBehaviour
     private void Reload()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void RegisterSquad(SquadSoldierAdder squad)
+    {
+        Squad = squad;
     }
 }

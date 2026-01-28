@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ public class SquadSoldierAdder : MonoBehaviour
     [SerializeField] private float minSeparation = 0.7f;
     [SerializeField] private int maxAttemptsPerSoldier = 40;
 
+    public int CurrentSoldierCount => GetComponentsInChildren<SoldierMarker>().Length;
+
     [SerializeField] private float soldierHeight = 0f;
 
     private int _nextId = 1;
@@ -20,6 +23,7 @@ public class SquadSoldierAdder : MonoBehaviour
     private readonly HashSet<int> _alive = new();
 
     private SoldierInstance _anchor; // the centered soldier
+    public event Action<int> SoldierCountChanged;
 
     private void Awake()
     {
@@ -57,6 +61,14 @@ public class SquadSoldierAdder : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.RegisterSquad(this);
+        else
+            Debug.LogError("No GameManager in scene.", this);
+    }
+
     private void SpawnAnchor()
     {
         var go = Instantiate(soldierPrefab, transform);
@@ -90,6 +102,8 @@ public class SquadSoldierAdder : MonoBehaviour
         Vector3 pos = FindNonOverlappingPoint();
         _positions[inst.Id] = pos;
         inst.transform.localPosition = pos;
+
+        NotifySoldierCountChanged();
     }
 
     public void RemoveSoldier(SoldierMarker soldierMarker)
@@ -122,6 +136,8 @@ public class SquadSoldierAdder : MonoBehaviour
         _positions.Remove(inst.Id);
 
         Invoke(nameof(CheckGameOver), 0f);
+
+
     }
 
     private void PromoteNewAnchor()
@@ -152,6 +168,7 @@ public class SquadSoldierAdder : MonoBehaviour
 
     private void CheckGameOver()
     {
+        NotifySoldierCountChanged();
         if (GetComponentsInChildren<SoldierMarker>().Length <= 0)
             GameManager.Instance.Lose();
     }
@@ -171,7 +188,7 @@ public class SquadSoldierAdder : MonoBehaviour
 
         for (int attempt = 0; attempt < maxAttemptsPerSoldier; attempt++)
         {
-            Vector2 p2 = Random.insideUnitCircle * clusterRadius;
+            Vector2 p2 = UnityEngine.Random.insideUnitCircle * clusterRadius;
 
             // Cluster around anchor at local (0,0,0)
             Vector3 candidate = new Vector3(p2.x, soldierHeight, p2.y);
@@ -193,7 +210,7 @@ public class SquadSoldierAdder : MonoBehaviour
         }
 
         // Fallback if packed too tight
-        Vector2 fallback = Random.insideUnitCircle * clusterRadius;
+        Vector2 fallback = UnityEngine.Random.insideUnitCircle * clusterRadius;
         return new Vector3(fallback.x, soldierHeight, fallback.y);
     }
     public SoldierMarker GetNearestSoldier(Vector3 fromWorldPos)
@@ -225,9 +242,14 @@ public class SquadSoldierAdder : MonoBehaviour
         {
             Destroy(soldiers[i].gameObject);
         }
-
+        NotifySoldierCountChanged();
         Invoke(nameof(CheckGameOver), 0f);
+
     }
 
+    private void NotifySoldierCountChanged()
+    {
+        SoldierCountChanged?.Invoke(CurrentSoldierCount);
+    }
 
 }
